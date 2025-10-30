@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionQuest - Binocular Vision Trainer</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6b8cbc;
+            --accent: #ff6b6b;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --success: #51cf66;
+            --warning: #ffd43b;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .panel {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .training-area {
+            flex: 2;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .exercise-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .exercise-btn {
+            background-color: var(--light);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .exercise-btn:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .exercise-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .target-objects {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .target-btn {
+            background-color: white;
+            border: 2px solid var(--light);
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80px;
+        }
+        
+        .target-btn:hover {
+            border-color: var(--secondary);
+        }
+        
+        .target-btn.active {
+            border-color: var(--primary);
+            background-color: var(--light);
+        }
+        
+        .target-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .slider-container {
+            margin-bottom: 20px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        .progress-section {
+            margin-top: 20px;
+        }
+        
+        .progress-chart {
+            height: 200px;
+            background-color: var(--light);
+            border-radius: 10px;
+            margin-top: 10px;
+            display: flex;
+            align-items: flex-end;
+            padding: 10px;
+        }
+        
+        .progress-bar {
+            background-color: var(--success);
+            margin: 0 5px;
+            border-radius: 5px 5px 0 0;
+            flex: 1;
+            transition: height 0.5s ease;
+        }
+        
+        #trainingCanvas {
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            box-shadow: var(--shadow);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--light);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .session-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .training-area {
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>VisionQuest</h1>
+            <p class="subtitle">Binocular Vision & Vergence Training System</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel controls">
+                <h2>Training Exercises</h2>
+                <div class="exercise-selector">
+                    <button class="exercise-btn active" data-exercise="vergence">Vergence</button>
+                    <button class="exercise-btn" data-exercise="fusion">Fusion</button>
+                    <button class="exercise-btn" data-exercise="jump">Jump Vergence</button>
+                    <button class="exercise-btn" data-exercise="smooth">Smooth Pursuit</button>
+                </div>
+                
+                <h2>Target Objects</h2>
+                <div class="target-objects">
+                    <button class="target-btn active" data-target="rocket">
+                        <div class="target-icon">🚀</div>
+                        <span>Rocket</span>
+                    </button>
+                    <button class="target-btn" data-target="ball">
+                        <div class="target-icon">⚽</div>
+                        <span>Ball</span>
+                    </button>
+                    <button class="target-btn" data-target="butterfly">
+                        <div class="target-icon">🦋</div>
+                        <span>Butterfly</span>
+                    </button>
+                    <button class="target-btn" data-target="car">
+                        <div class="target-icon">🚗</div>
+                        <span>Car</span>
+                    </button>
+                    <button class="target-btn" data-target="duck">
+                        <div class="target-icon">🦆</div>
+                        <span>Duck</span>
+                    </button>
+                </div>
+                
+                <h2>Training Parameters</h2>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Speed</span>
+                        <span id="speedValue">Medium</span>
+                    </div>
+                    <input type="range" id="speedSlider" min="1" max="5" value="3">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Difficulty</span>
+                        <span id="difficultyValue">Medium</span>
+                    </div>
+                    <input type="range" id="difficultySlider" min="1" max="5" value="3">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Duration (minutes)</span>
+                        <span id="durationValue">5</span>
+                    </div>
+                    <input type="range" id="durationSlider" min="1" max="15" value="5">
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-success" id="startBtn">Start Training</button>
+                    <button class="btn" id="pauseBtn" disabled>Pause</button>
+                    <button class="btn btn-warning" id="resetBtn">Reset</button>
+                </div>
+                
+                <div class="session-info">
+                    <div>Session: <span id="sessionTime">00:00</span></div>
+                    <div>Score: <span id="sessionScore">0</span></div>
+                </div>
+                
+                <div class="instructions">
+                    <h3>Instructions</h3>
+                    <p>Focus on maintaining single vision of the target object as it moves. Try to keep the object clear and single without double vision.</p>
+                </div>
+            </div>
+            
+            <div class="panel training-area">
+                <canvas id="trainingCanvas" width="600" height="450"></canvas>
+            </div>
+            
+            <div class="panel progress-section">
+                <h2>Progress Tracking</h2>
+                <div class="progress-chart" id="progressChart">
+                    <div class="progress-bar" style="height: 70%"></div>
+                    <div class="progress-bar" style="height: 85%"></div>
+                    <div class="progress-bar" style="height: 65%"></div>
+                    <div class="progress-bar" style="height: 90%"></div>
+                    <div class="progress-bar" style="height: 75%"></div>
+                </div>
+                
+                <h2>Session History</h2>
+                <div id="sessionHistory">
+                    <p>Today: Vergence training - 8/10 success rate</p>
+                    <p>Yesterday: Fusion training - 7/10 success rate</p>
+                    <p>May 15: Jump vergence - 6/10 success rate</p>
+                </div>
+                
+                <button class="btn" style="margin-top: 15px;">Export Report (PDF)</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>VisionQuest &copy; 2023 - Binocular Vision Training System for Orthoptists, Optometrists, and Patients</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const canvas = document.getElementById('trainingCanvas');
+            const ctx = canvas.getContext('2d');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const exerciseBtns = document.querySelectorAll('.exercise-btn');
+            const targetBtns = document.querySelectorAll('.target-btn');
+            const speedSlider = document.getElementById('speedSlider');
+            const difficultySlider = document.getElementById('difficultySlider');
+            const durationSlider = document.getElementById('durationSlider');
+            const speedValue = document.getElementById('speedValue');
+            const difficultyValue = document.getElementById('difficultyValue');
+            const durationValue = document.getElementById('durationValue');
+            const sessionTime = document.getElementById('sessionTime');
+            const sessionScore = document.getElementById('sessionScore');
+            
+            // Training state
+            let isTraining = false;
+            let isPaused = false;
+            let currentExercise = 'vergence';
+            let currentTarget = 'rocket';
+            let score = 0;
+            let timeElapsed = 0;
+            let timerInterval;
+            
+            // Initialize sliders
+            speedSlider.addEventListener('input', function() {
+                const speeds = ['Very Slow', 'Slow', 'Medium', 'Fast', 'Very Fast'];
+                speedValue.textContent = speeds[this.value - 1];
+            });
+            
+            difficultySlider.addEventListener('input', function() {
+                const difficulties = ['Very Easy', 'Easy', 'Medium', 'Hard', 'Very Hard'];
+                difficultyValue.textContent = difficulties[this.value - 1];
+            });
+            
+            durationSlider.addEventListener('input', function() {
+                durationValue.textContent = this.value;
+            });
+            
+            // Exercise selection
+            exerciseBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    exerciseBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentExercise = this.dataset.exercise;
+                    resetTraining();
+                });
+            });
+            
+            // Target selection
+            targetBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    targetBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTarget = this.dataset.target;
+                    drawTarget();
+                });
+            });
+            
+            // Control buttons
+            startBtn.addEventListener('click', function() {
+                if (!isTraining) {
+                    startTraining();
+                }
+            });
+            
+            pauseBtn.addEventListener('click', function() {
+                if (isTraining && !isPaused) {
+                    pauseTraining();
+                } else if (isTraining && isPaused) {
+                    resumeTraining();
+                }
+            });
+            
+            resetBtn.addEventListener('click', resetTraining);
+            
+            // Training functions
+            function startTraining() {
+                isTraining = true;
+                isPaused = false;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                pauseBtn.textContent = 'Pause';
+                
+                // Start timer
+                timerInterval = setInterval(function() {
+                    if (!isPaused) {
+                        timeElapsed++;
+                        updateTimer();
+                        
+                        // Check if session duration reached
+                        const duration = parseInt(durationSlider.value) * 60;
+                        if (timeElapsed >= duration) {
+                            endTraining();
+                        }
+                    }
+                }, 1000);
+                
+                // Start animation
+                animate();
+            }
+            
+            function pauseTraining() {
+                isPaused = true;
+                pauseBtn.textContent = 'Resume';
+            }
+            
+            function resumeTraining() {
+                isPaused = false;
+                pauseBtn.textContent = 'Pause';
+            }
+            
+            function resetTraining() {
+                isTraining = false;
+                isPaused = false;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                pauseBtn.textContent = 'Pause';
+                timeElapsed = 0;
+                score = 0;
+                sessionTime.textContent = '00:00';
+                sessionScore.textContent = '0';
+                
+                clearInterval(timerInterval);
+                drawTarget();
+            }
+            
+            function endTraining() {
+                isTraining = false;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                clearInterval(timerInterval);
+                
+                // Show completion message
+                ctx.font = '24px Arial';
+                ctx.fillStyle = '#4a6fa5';
+                ctx.textAlign = 'center';
+                ctx.fillText('Training Complete!', canvas.width / 2, canvas.height / 2);
+                ctx.font = '18px Arial';
+                ctx.fillText(`Final Score: ${score}`, canvas.width / 2, canvas.height / 2 + 30);
+            }
+            
+            function updateTimer() {
+                const minutes = Math.floor(timeElapsed / 60);
+                const seconds = timeElapsed % 60;
+                sessionTime.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            // Animation variables
+            let x = canvas.width / 2;
+            let y = canvas.height / 2;
+            let dx = 2;
+            let dy = 2;
+            let size = 60;
+            let rotation = 0;
+            let lastTime = 0;
+            
+            function animate(currentTime = 0) {
+                if (!isTraining || isPaused) return;
+                
+                const deltaTime = currentTime - lastTime;
+                lastTime = currentTime;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Update position based on exercise
+                switch(currentExercise) {
+                    case 'vergence':
+                        // Horizontal movement for vergence training
+                        x += dx * (speedSlider.value / 2);
+                        if (x + size > canvas.width || x - size < 0) {
+                            dx = -dx;
+                            increaseScore();
+                        }
+                        break;
+                        
+                    case 'fusion':
+                        // Circular movement with size changes
+                        rotation += 0.02;
+                        x = canvas.width / 2 + Math.cos(rotation) * 100;
+                        y = canvas.height / 2 + Math.sin(rotation) * 100;
+                        size = 50 + Math.sin(rotation * 2) * 20;
+                        if (rotation % (Math.PI * 2) < 0.1) {
+                            increaseScore();
+                        }
+                        break;
+                        
+                    case 'jump':
+                        // Jump between positions
+                        if (currentTime % 2000 < 16) { // Every 2 seconds
+                            x = Math.random() * (canvas.width - size * 2) + size;
+                            y = Math.random() * (canvas.height - size * 2) + size;
+                            increaseScore();
+                        }
+                        break;
+                        
+                    case 'smooth':
+                        // Smooth pursuit - figure 8 pattern
+                        x = canvas.width / 2 + Math.sin(rotation) * 150;
+                        y = canvas.height / 2 + Math.sin(rotation * 2) * 75;
+                        rotation += 0.01 * (speedSlider.value / 3);
+                        if (rotation % (Math.PI * 2) < 0.1) {
+                            increaseScore();
+                        }
+                        break;
+                }
+                
+                // Draw target
+                drawTarget();
+                
+                // Continue animation
+                requestAnimationFrame(animate);
+            }
+            
+            function drawTarget() {
+                // Draw background effect for binocular training
+                ctx.fillStyle = 'rgba(200, 220, 240, 0.3)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw target based on selection
+                switch(currentTarget) {
+                    case 'rocket':
+                        drawRocket(x, y, size);
+                        break;
+                    case 'ball':
+                        drawBall(x, y, size);
+                        break;
+                    case 'butterfly':
+                        drawButterfly(x, y, size);
+                        break;
+                    case 'car':
+                        drawCar(x, y, size);
+                        break;
+                    case 'duck':
+                        drawDuck(x, y, size);
+                        break;
+                }
+                
+                // Draw convergence guides
+                ctx.strokeStyle = 'rgba(100, 100, 100, 0.2)';
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
+            function drawRocket(x, y, size) {
+                // Rocket body
+                ctx.fillStyle = '#ff6b6b';
+                ctx.beginPath();
+                ctx.moveTo(x, y - size/2);
+                ctx.lineTo(x - size/3, y + size/2);
+                ctx.lineTo(x + size/3, y + size/2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Rocket fins
+                ctx.fillStyle = '#4a6fa5';
+                ctx.beginPath();
+                ctx.moveTo(x - size/3, y + size/2);
+                ctx.lineTo(x - size/2, y + size);
+                ctx.lineTo(x - size/6, y + size/2);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(x + size/3, y + size/2);
+                ctx.lineTo(x + size/2, y + size);
+                ctx.lineTo(x + size/6, y + size/2);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Rocket window
+                ctx.fillStyle = '#e0f7fa';
+                ctx.beginPath();
+                ctx.arc(x, y, size/6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Flame
+                ctx.fillStyle = '#ffd43b';
+                ctx.beginPath();
+                ctx.moveTo(x - size/6, y + size/2);
+                ctx.lineTo(x, y + size);
+                ctx.lineTo(x + size/6, y + size/2);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            function drawBall(x, y, size) {
+                // Ball
+                ctx.fillStyle = '#51cf66';
+                ctx.beginPath();
+                ctx.arc(x, y, size/2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Ball pattern
+                ctx.strokeStyle = '#2b8a3e';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x, y, size/2, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(x - size/2, y);
+                ctx.lineTo(x + size/2, y);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y - size/2);
+                ctx.lineTo(x, y + size/2);
+                ctx.stroke();
+            }
+            
+            function drawButterfly(x, y, size) {
+                // Butterfly body
+                ctx.fillStyle = '#2c3e50';
+                ctx.fillRect(x - size/10, y - size/3, size/5, size/1.5);
+                
+                // Butterfly wings
+                ctx.fillStyle = '#9b59b6';
+                ctx.beginPath();
+                ctx.ellipse(x - size/3, y, size/2, size/3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.ellipse(x + size/3, y, size/2, size/3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Wing details
+                ctx.fillStyle = '#e056fd';
+                ctx.beginPath();
+                ctx.ellipse(x - size/3, y, size/4, size/5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.ellipse(x + size/3, y, size/4, size/5, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            function drawCar(x, y, size) {
+                // Car body
+                ctx.fillStyle = '#3498db';
+                ctx.fillRect(x - size/2, y - size/4, size, size/2);
+                
+                // Car top
+                ctx.fillRect(x - size/3, y - size/2, size/1.5, size/4);
+                
+                // Wheels
+                ctx.fillStyle = '#2c3e50';
+                ctx.beginPath();
+                ctx.arc(x - size/3, y + size/4, size/5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.arc(x + size/3, y + size/4, size/5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Windows
+                ctx.fillStyle = '#aed6f1';
+                ctx.fillRect(x - size/4, y - size/3, size/3, size/6);
+                ctx.fillRect(x + size/8, y - size/3, size/3, size/6);
+            }
+            
+            function drawDuck(x, y, size) {
+                // Duck body
+                ctx.fillStyle = '#ffd43b';
+                ctx.beginPath();
+                ctx.ellipse(x, y, size/2, size/3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Duck head
+                ctx.beginPath();
+                ctx.arc(x + size/3, y - size/4, size/3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Duck beak
+                ctx.fillStyle = '#ffa94d';
+                ctx.beginPath();
+                ctx.moveTo(x + size/2, y - size/4);
+                ctx.lineTo(x + size/1.5, y - size/6);
+                ctx.lineTo(x + size/2, y);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Duck eye
+                ctx.fillStyle = '#2c3e50';
+                ctx.beginPath();
+                ctx.arc(x + size/2.5, y - size/3, size/10, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            function increaseScore() {
+                if (isTraining && !isPaused) {
+                    score += 10;
+                    sessionScore.textContent = score;
+                }
+            }
+            
+            // Initialize
+            drawTarget();
+        });
+    </script>
+</body>
+</html>
