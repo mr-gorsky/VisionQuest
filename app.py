@@ -38,12 +38,12 @@ if 'assessment_data' not in st.session_state:
     }
 
 # HEADER SA TVOJIM LOGOM
-col1, col2 = st.columns([1, 4])
+col1, col2 = st.columns([4, 1])
 with col1:
-    st.image("https://i.postimg.cc/853pWNYm/Gemini-Generated-Image-gokhtxgokhtxgokh.png", width=500)
-with col2:
     st.title("VisionQuest")
     st.markdown("**Binocular Vision & Vergence Training System**")
+with col2:
+    st.image("https://i.postimg.cc/PfKTSZBT/Phantasmed-logo.png", width=250)
 st.markdown("---")
 
 # Patient Information
@@ -78,7 +78,7 @@ else:
 exercise = st.selectbox("Select Exercise", 
                        ["Vergence", "Fusion", "Jump Vergence", "Smooth Pursuit", "Accommodative Rock"])
 
-# EXERCISE AREA
+# EXERCISE AREA - POVEĆAN PRAVOKUTNIK ZA VJEŽBE
 st.markdown("---")
 st.subheader(f"🎯 {exercise} Exercise")
 
@@ -96,52 +96,55 @@ if st.session_state.exercise_started and st.session_state.current_exercise == ex
     # Exercise is running - PRAVE ANIMACIJE
     st.success(f"**{exercise} Exercise Running** - Time: {st.session_state.exercise_time_remaining}s")
     
-    # Stvarno korisne animacije
-    if exercise == "Vergence":
-        st.info("🎯 Follow the target moving toward you and away")
-        depth = math.sin(time.time() * 2)
-        target_size = 120 + int(depth * 80)
-        st.markdown(f"<div style='text-align: center; font-size: {target_size}px;'>{current_targets[0]}</div>", unsafe_allow_html=True)
-        st.write(f"**Depth:** {'NEAR' if depth > 0 else 'FAR'}")
-        
-    elif exercise == "Fusion":
-        st.info("🔮 Fuse the red and blue images into one")
-        col1, col2, col3 = st.columns([1, 1, 1])
-        with col1:
-            st.markdown(f"<div style='text-align: center; font-size: 80px; color: red;'>{current_targets[0]}</div>", unsafe_allow_html=True)
-        with col2:
-            st.markdown("<div style='text-align: center; font-size: 40px; margin-top: 20px;'>+</div>", unsafe_allow_html=True)
-        with col3:
-            st.markdown(f"<div style='text-align: center; font-size: 80px; color: blue;'>{current_targets[1] if len(current_targets) > 1 else current_targets[0]}</div>", unsafe_allow_html=True)
-        st.write("**Focus:** Bring images together to see one clear target")
-        
-    elif exercise == "Jump Vergence":
-        st.info("🔄 Quickly switch focus between targets")
-        current_idx = int(time.time() * 2) % min(4, len(current_targets))
-        cols = st.columns(4)
-        for i in range(4):
-            with cols[i]:
-                if i < len(current_targets):
-                    st.markdown(f"<div style='text-align: center; font-size: {80 if i == current_idx else 40}px; opacity: {1.0 if i == current_idx else 0.3};'>{current_targets[i]}</div>", unsafe_allow_html=True)
-        st.write(f"**Current target:** {current_targets[current_idx]}")
-        
-    elif exercise == "Smooth Pursuit":
-        st.info("🌀 Smoothly follow the moving target")
-        pos = int((math.sin(time.time() * 3) + 1) * 50)
-        empty_cols = st.columns(10)
-        with empty_cols[min(9, pos // 10)]:
-            st.markdown(f"<div style='text-align: center; font-size: 60px;'>{current_targets[0]}</div>", unsafe_allow_html=True)
-        st.write("**Follow the target with your eyes smoothly**")
-        
-    elif exercise == "Accommodative Rock":
-        st.info("👁️ Alternate focus between near and far")
-        is_near = int(time.time()) % 2 == 0
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown(f"<div style='text-align: center; font-size: {100 if is_near else 40}px; color: #d32f2f;'>NEAR</div>", unsafe_allow_html=True)
-        with col2:
-            st.markdown(f"<div style='text-align: center; font-size: {40 if is_near else 100}px; color: #1976d2;'>FAR</div>", unsafe_allow_html=True)
-        st.write(f"**Focus on:** {'NEAR target (LEFT)' if is_near else 'FAR target (RIGHT)'}")
+    # POVEĆAN KONTEJNER ZA VJEŽBE
+    exercise_container = st.container()
+    with exercise_container:
+        # Stvarno korisne animacije
+        if exercise == "Vergence":
+            st.info("🎯 Follow the target moving toward you and away")
+            depth = math.sin(time.time() * 2)
+            target_size = 120 + int(depth * 80)
+            st.markdown(f"<div style='text-align: center; font-size: {target_size}px; min-height: 200px; display: flex; align-items: center; justify-content: center;'>{current_targets[0]}</div>", unsafe_allow_html=True)
+            st.write(f"**Depth:** {'NEAR' if depth > 0 else 'FAR'}")
+            
+        elif exercise == "Fusion":
+            st.info("🔮 Fuse the red and blue images into one")
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col1:
+                st.markdown(f"<div style='text-align: center; font-size: 80px; color: red; min-height: 150px; display: flex; align-items: center; justify-content: center;'>{current_targets[0]}</div>", unsafe_allow_html=True)
+            with col2:
+                st.markdown("<div style='text-align: center; font-size: 40px; margin-top: 20px; min-height: 150px; display: flex; align-items: center; justify-content: center;'>+</div>", unsafe_allow_html=True)
+            with col3:
+                st.markdown(f"<div style='text-align: center; font-size: 80px; color: blue; min-height: 150px; display: flex; align-items: center; justify-content: center;'>{current_targets[1] if len(current_targets) > 1 else current_targets[0]}</div>", unsafe_allow_html=True)
+            st.write("**Focus:** Bring images together to see one clear target")
+            
+        elif exercise == "Jump Vergence":
+            st.info("🔄 Quickly switch focus between targets")
+            current_idx = int(time.time() * 2) % min(4, len(current_targets))
+            cols = st.columns(4)
+            for i in range(4):
+                with cols[i]:
+                    if i < len(current_targets):
+                        st.markdown(f"<div style='text-align: center; font-size: {80 if i == current_idx else 40}px; opacity: {1.0 if i == current_idx else 0.3}; min-height: 150px; display: flex; align-items: center; justify-content: center;'>{current_targets[i]}</div>", unsafe_allow_html=True)
+            st.write(f"**Current target:** {current_targets[current_idx]}")
+            
+        elif exercise == "Smooth Pursuit":
+            st.info("🌀 Smoothly follow the moving target")
+            pos = int((math.sin(time.time() * 3) + 1) * 50)
+            empty_cols = st.columns(10)
+            with empty_cols[min(9, pos // 10)]:
+                st.markdown(f"<div style='text-align: center; font-size: 60px; min-height: 150px; display: flex; align-items: center; justify-content: center;'>{current_targets[0]}</div>", unsafe_allow_html=True)
+            st.write("**Follow the target with your eyes smoothly**")
+            
+        elif exercise == "Accommodative Rock":
+            st.info("👁️ Alternate focus between near and far")
+            is_near = int(time.time()) % 2 == 0
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"<div style='text-align: center; font-size: {100 if is_near else 40}px; color: #d32f2f; min-height: 150px; display: flex; align-items: center; justify-content: center;'>NEAR</div>", unsafe_allow_html=True)
+            with col2:
+                st.markdown(f"<div style='text-align: center; font-size: {40 if is_near else 100}px; color: #1976d2; min-height: 150px; display: flex; align-items: center; justify-content: center;'>FAR</div>", unsafe_allow_html=True)
+            st.write(f"**Focus on:** {'NEAR target (LEFT)' if is_near else 'FAR target (RIGHT)'}")
     
     # Timer
     if st.session_state.exercise_time_remaining > 0:
